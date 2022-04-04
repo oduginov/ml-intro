@@ -8,7 +8,7 @@
 - Read [this article](https://towardsdatascience.com/the-5-classification-evaluation-metrics-you-must-know-aa97784ff226) for an extended overview of the ways to evaluate classification models.
 - Read [Imbalanced classification approaches overview](https://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/).
 - *Optional*. Read [KNN notes](https://sebastianraschka.com/pdf/lecture-notes/stat479fs18/02_knn_notes.pdf) - KNN explanation including computational performance analysis.
-
+- total
 
 # Assignment
 
