@@ -41,7 +41,7 @@ def sum_up_tree_values(tree, field):
 
 
 def sum_up_forest_values(forest, field):
-    """Sums up values of requested field in all the trees of a firest
+    """Sums up values of requested field in all the trees of a forest
 
     Args:
         forest: RandomForestClassifier
@@ -63,8 +63,8 @@ def test_gini_index(func):
         assert np.isclose(func(x), value), f'Should be {value} for {x}'
     test(np.array([]), 0.0)
     test(np.array([1]), 0.0)
-    test(np.array([1, 2]), 0.5)
-    test(np.array([1, 1, 2]), 4/9)
+    test(np.array([1, 0]), 0.5)
+    test(np.array([1, 1, 0]), 4/9)
     trgt = np.random.default_rng(RANDOM_STATE).choice([0, 1], 20)
     test(trgt, 0.455)
     print('\033[92m All good!')
@@ -73,20 +73,22 @@ def test_gini_index(func):
 def test_gini_gain(func):
     def test(x, xs, value):
         assert np.isclose(func(x, xs), value), f'Should be {value} for {x} and {xs}'
-    test(np.array([1, 1, 2]), [np.array([1, 1]), np.array([2])], 4/9)
-    test(np.array([1, 1, 2]), [np.array([1]), np.array([1, 2])], 1/9)
+    test(np.array([1, 1, 0]), [np.array([1, 1]), np.array([0])], 4/9)
+    test(np.array([1, 1, 0]), [np.array([1]), np.array([1, 0])], 1/9)
     trgt = np.random.default_rng(RANDOM_STATE).choice([0, 1], 20)
     test(trgt, [trgt[:10], trgt[10:]], 0.045)
     print('\033[92m All good!')
 
 
 def test_entropy(func):
+    assert func(np.array([0])) == 0.0, 'Should be 0.0 if all elements are equal'
+    assert func(np.array([1])) == 0.0, 'Should be 0.0 if all elements are equal'
+
     def test(x, value):
         assert np.isclose(func(x), value), f'Should be {value} for {x}'
     test(np.array([]), 0.0)
-    test(np.array([1]), 0.0)
-    test(np.array([1, 2]), 0.69314718)
-    test(np.array([1, 1, 2]), 0.63651416)
+    test(np.array([1, 0]), 0.69314718)
+    test(np.array([1, 1, 0]), 0.63651416)
     trgt = np.random.default_rng(RANDOM_STATE).choice([0, 1], 20)
     test(trgt, 0.64744663)
     print('\033[92m All good!')
@@ -95,8 +97,8 @@ def test_entropy(func):
 def test_information_gain(func):
     def test(x, xs, value):
         assert np.isclose(func(x, xs), value), f'Should be {value} for {x} and {xs}'
-    test(np.array([1, 1, 2]), [np.array([1, 1]), np.array([2])], 0.63651416)
-    test(np.array([1, 1, 2]), [np.array([1]), np.array([1, 2])], 0.17441604)
+    test(np.array([1, 1, 0]), [np.array([1, 1]), np.array([0])], 0.63651416)
+    test(np.array([1, 1, 0]), [np.array([1]), np.array([1, 0])], 0.17441604)
     trgt = np.random.default_rng(RANDOM_STATE).choice([0, 1], 20)
     test(trgt, [trgt[:10], trgt[10:]], 0.05067183)
     print('\033[92m All good!')
@@ -134,7 +136,7 @@ def test_tree(Tree):
         "Your tree grows more then allowed by max_depth."
     tree.fit(df, np.array([1, 1, 1, 1, 1]))
     assert tree.left_child is None and tree.right_child is None, \
-        "Your tree grows even when it is pure"
+       "Your tree grows even when it is pure"
 
     tree = Tree(criterion='entropy', random_gen=np.random.default_rng(RANDOM_STATE))
     tree.fit(df, y, max_depth=1)
@@ -156,7 +158,6 @@ def test_tree(Tree):
     X_train, X_test, y_train, y_test = create_datasets()
     tree = Tree(criterion='gini', random_gen=np.random.default_rng(RANDOM_STATE))
     tree.fit(X_train, y_train, max_depth=3, feature_frac=0.7)
-
     assert np.allclose([sum_up_tree_values(tree, field) for field in
                                     ['threshold', 'outcome_probs', 'column_index']],
                        [0.28624208, 4.0, 28.0]), "Your fit method seems to have an error"
